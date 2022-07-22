@@ -1,0 +1,116 @@
+﻿<html>
+<head>
+<title>AIS signal strength</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+  integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+  crossorigin="" />
+
+<style>
+
+  html, body {
+    padding: 0px;
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+  }
+
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+
+  @keyframes fadeout {
+    0% { opacity: 0.75;}
+    75% { opacity: 0.5; }
+    99% { opacity: 0.25;}
+    100% { opacity: 0.2;  }
+  }
+
+  .blinking {
+    animation: fadeout 10s;
+    animation-fill-mode: forwards;
+  }
+
+  </style>
+</head>
+
+<body>
+
+  <div id="map"></div>
+  <canvas id="myChart"></canvas>
+  <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+    crossorigin=""></script>
+
+  <script>
+
+  var layers = {}
+  var markers = new Array();
+
+  var map = L.map('map').setView([52.078663,4.288788], 10);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  function drawSignal(mmsi,lat,lon,rad,col)
+  {
+    if(rad<10) 
+      rad = 10;
+
+    if(mmsi in markers) {
+      map.removeLayer(layers[mmsi]);
+    }
+
+    var m =  L.circle([lat, lon], {
+      color: col,
+      fillColor: col,
+      fillOpacity: 0.5,
+      radius: rad,
+      className: 'blinking'
+    });
+
+    markers.push(m);
+    layers[mmsi] = map.addLayer(m);
+  }
+
+  function receiveSignals(websocket) {
+
+    websocket.addEventListener("message", ({ data }) => {
+
+      const event = JSON.parse(data);
+      var radius = 500+500/50.0 * event["power"];
+
+      if(event["channel"] == 'A')
+        drawSignal(event["mmsi"],event["lat"],event["lon"],radius,'red');
+      else
+        drawSignal(event["mmsi"],event["lat"],event["lon"],radius,'blue');
+    }); 
+  };
+
+  var interval = setInterval(function() {
+
+    for(i=0;i<markers.length;i++) {
+      var radius = markers[i].getRadius();
+      radius = (radius-10)*0.9+10;
+      markers[i].setRadius(radius);
+  }  
+  }, 100);
+
+  window.addEventListener("DOMContentLoaded", () => {
+
+    const websocket = new WebSocket("ws://localhost:8002/")
+
+    websocket.onopen = function (event) {
+      const hello = { type: "send" };
+      websocket.send(JSON.stringify(hello)) 
+    }
+
+    receiveSignals(websocket);
+  });
+
+  </script>
+
+</body>
+</html>
