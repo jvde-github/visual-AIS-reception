@@ -10,4 +10,4 @@ Steps:
 3. Start run server: ``./run.server``.
 4. Open the file ``index.html`` in your web browser
 
-YOu might need to fiddle a bit with the scripts as there is no proper error handling and there might be changes required depending on your system etc. These files are intended for experimentation with visualizing AIS radio reception.
+You might need to fiddle a bit with the scripts as there is no proper error handling and there might be changes required depending on your system etc. These files are intended for experimentation with visualizing AIS radio reception.
