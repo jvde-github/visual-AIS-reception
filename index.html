@@ -1,4 +1,4 @@
-﻿<html>
+<html>
 <head>
 <title>AIS signal strength</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
@@ -19,18 +19,6 @@
     width: 100%;
   }
 
-  @keyframes fadeout {
-    0% { opacity: 0.75;}
-    75% { opacity: 0.5; }
-    99% { opacity: 0.25;}
-    100% { opacity: 0.2;  }
-  }
-
-  .blinking {
-    animation: fadeout 10s;
-    animation-fill-mode: forwards;
-  }
-
   </style>
 </head>
 
@@ -44,8 +32,7 @@
 
   <script>
 
-  var layers = {}
-  var markers = new Array();
+  var markers = {};
 
   var map = L.map('map').setView([52.078663,4.288788], 10);
 
@@ -59,22 +46,25 @@
     if(rad<10) 
       rad = 10;
 
-    console.log(mmsi);
-
     if(mmsi in markers) {
-      map.removeLayer(layers[mmsi]);
+      markers[mmsi].setRadius(rad);
+      markers[mmsi].setStyle( { 
+      color: col,
+      fillColor: col,
+      fillOpacity: 0.5,
+      });
     }
-
-    var m =  L.circle([lat, lon], {
+    else
+    {
+      markers[mmsi] = L.circle([lat, lon], {
       color: col,
       fillColor: col,
       fillOpacity: 0.5,
       radius: rad,
-      className: 'blinking'
-    });
+      });
 
-    markers.push(m);
-    layers[mmsi] = map.addLayer(m);
+      map.addLayer(markers[mmsi]);
+    }
   }
 
   function receiveSignals(websocket) {
@@ -93,11 +83,12 @@
 
   var interval = setInterval(function() {
 
-    for(i=0;i<markers.length;i++) {
-      var radius = markers[i].getRadius();
+    for (let [key, m] of Object.entries(markers))
+    {
+      var radius = m.getRadius();
       radius = (radius-10)*0.9+10;
-      markers[i].setRadius(radius);
-  }  
+      m.setRadius(radius);
+    }
   }, 100);
 
   window.addEventListener("DOMContentLoaded", () => {
