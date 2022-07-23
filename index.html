@@ -24,15 +24,41 @@
 
 <body>
 
+  Decay Speed:
+  <div class="slidecontainer">
+  <input type="range" min="50" max="100" value="75" id="decay_speed">
+  </div>
+
+  Circle size:
+  <div class="slidecontainer">
+  <input type="range" min="10" max="10000" value="2000" id="circle_size">
+  </div>
+
   <div id="map"></div>
-  <canvas id="myChart"></canvas>
   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
     integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
     crossorigin=""></script>
 
   <script>
 
+  var decay_slider = document.getElementById("decay_speed");
+  var circle_slider = document.getElementById("circle_size");
+
+  var decay_speed = 0.85;
+  var circle_size = 2000;
+
+  decay_slider.value = 100 * decay_speed;
+  circle_slider.value = circle_size;
+
   var markers = {};
+
+  decay_slider.oninput = function() {
+     decay_speed = this.value/100;
+  } 
+
+  circle_slider.oninput = function() {
+     circle_size = this.value*1.0;
+  } 
   
   var map = L.map('map').setView([52.078663,4.288788], 10);
 
@@ -48,6 +74,7 @@
 
     if(mmsi in markers) {
       markers[mmsi].setRadius(rad);
+      markers[mmsi].latLng(lat,lng);
       markers[mmsi].setStyle( { 
       color: col,
       fillColor: col,
@@ -72,8 +99,7 @@
     websocket.addEventListener("message", ({ data }) => {
 
       const event = JSON.parse(data);
-      //var radius = 500+500/50.0 * event["power"];
-      var radius = 2000+2000/50.0 * event["power"];
+      var radius = circle_size+circle_size/50.0 * event["power"];
 
       if(event["channel"] == 'A')
         drawSignal(event["mmsi"],event["lat"],event["lon"],radius,'red');
@@ -87,7 +113,7 @@
     for (let [key, m] of Object.entries(markers))
     {
       var radius = m.getRadius();
-      radius = (radius-10)*0.85+10;
+      radius = (radius-10)*decay_speed+10;
       m.setRadius(radius);
     }
   }, 100);
