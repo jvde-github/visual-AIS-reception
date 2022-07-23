@@ -1,4 +1,4 @@
-echo "Open http://127.0.0.1:8002 in your browser" 
+echo "Open index.html" 
 echo "------------------------------------------"
 echo 
 
