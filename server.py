@@ -21,7 +21,7 @@ async def producer_handler(websocket, path):
         e = decode(*d["NMEA"]).asdict()
 
         if 'lat' in e.keys():
-            v = {'lat' : e["lat"], 'lon' : e["lon"], 'power' : d['power'], 'ppm' : d['ppm'], 'channel' : d['channel'] }
+            v = {'mmsi' : d['mmsi'], 'lat' : e["lat"], 'lon' : e["lon"], 'power' : d['power'], 'ppm' : d['ppm'], 'channel' : d['channel'] }
 
         await websocket.send(json.dumps(v))
 

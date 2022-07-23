@@ -59,6 +59,8 @@
     if(rad<10) 
       rad = 10;
 
+    console.log(mmsi);
+
     if(mmsi in markers) {
       map.removeLayer(layers[mmsi]);
     }
