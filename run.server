@@ -2,4 +2,4 @@ echo "Open http://127.0.0.1:8002 in your browser"
 echo "------------------------------------------"
 echo 
 
-AIS-catcher -v -o 3 | ./server.py
+AIS-catcher -v -o 3 -M D | ./server.py
