@@ -33,7 +33,7 @@
   <script>
 
   var markers = {};
-
+  
   var map = L.map('map').setView([52.078663,4.288788], 10);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -72,7 +72,8 @@
     websocket.addEventListener("message", ({ data }) => {
 
       const event = JSON.parse(data);
-      var radius = 500+500/50.0 * event["power"];
+      //var radius = 500+500/50.0 * event["power"];
+      var radius = 2000+2000/50.0 * event["power"];
 
       if(event["channel"] == 'A')
         drawSignal(event["mmsi"],event["lat"],event["lon"],radius,'red');
@@ -86,7 +87,7 @@
     for (let [key, m] of Object.entries(markers))
     {
       var radius = m.getRadius();
-      radius = (radius-10)*0.9+10;
+      radius = (radius-10)*0.85+10;
       m.setRadius(radius);
     }
   }, 100);
