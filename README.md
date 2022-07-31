@@ -5,7 +5,7 @@ Few scripts to animate AIS signal-reception in your web browser as demonstrated 
 
 Steps:
 
-1. Install dependecies (python, websockets, AIS-catcher)
+1. Install dependecies (python, websockets, AIS-catcher, pyais)
 2. Edit ``run.server`` to set your desired AIS-catcher settings
 3. Start run server: ``./run.server``.
 4. Open the file ``index.html`` in your web browser
