@@ -14,16 +14,15 @@ async def consumer_handler(websocket, path):
 
 async def producer_handler(websocket, path):
 
-    print("Producer running")
+    print("Websocket server running")
 
     for line in sys.stdin:
         d = json.loads(line)
-        e = decode(*d["NMEA"]).asdict()
+        e = decode(*d["nmea"]).asdict()
 
         if 'lat' in e.keys():
             v = {'mmsi' : d['mmsi'], 'lat' : e["lat"], 'lon' : e["lon"], 'power' : d['signalpower'], 'ppm' : d['ppm'], 'channel' : d['channel'] }
-
-        await websocket.send(json.dumps(v))
+            await websocket.send(json.dumps(v))
 
 async def handler(websocket, path):
     asyncio.ensure_future(consumer_handler(websocket, path))
